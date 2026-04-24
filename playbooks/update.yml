@@ -1,0 +1,6 @@
+- name: Update all containers
+  hosts: all
+  become: yes
+
+  roles:
+    - update

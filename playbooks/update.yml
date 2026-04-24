@@ -4,3 +4,19 @@
 
   roles:
     - update
+
+- name: Check if reboot is required on a host, if yes, send Discord notification
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../group_vars/all/vault.yml
+  tasks:
+    - name: Build list of hosts requiring reboot
+      set_fact:
+        reboot_hosts: "{{ groups['all'] | map('extract', hostvars) | selectattr('needs_reboot', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+    - name: Send Discord notification if reboot required
+      community.general.discord:
+        webhook_id: "{{ discord_webhook_id }}"
+        webhook_token: "{{ discord_webhook_token }}"
+        content: "The following containers require a reboot: {{ reboot_hosts | join(', ') }}"
+      when: reboot_hosts | length > 0

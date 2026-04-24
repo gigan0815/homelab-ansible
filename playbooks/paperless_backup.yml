@@ -1,0 +1,6 @@
+- name: Run paperless-ngx backup
+  hosts: paperless
+  become: yes
+
+  roles:
+    - paperless_backup

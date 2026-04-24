@@ -1,0 +1,27 @@
+- name: Install rclone
+  shell: curl https://rclone.org/install.sh | bash
+  args:
+    creates: /usr/bin/rclone
+
+- name: Create export directory
+  file:
+    path: "{{ paperless_export_dir }}"
+    state: directory
+
+- name: Start paperless-ngx export
+  shell: "uv run manage.py document_exporter {{ paperless_export_dir }}"
+  args:
+    chdir: "{{ paperless_install_dir }}/src"
+
+- name: Create rclone config directory
+  file:
+    path: /root/.config/rclone
+    state: directory
+
+- name: Copy rclone.conf to LXC
+  copy:
+    src: rclone.conf
+    dest: /root/.config/rclone/rclone.conf
+
+- name: Rclone sync to OneDrive
+  shell: rclone sync "{{ paperless_export_dir }}" "{{ rclone_destination }}"

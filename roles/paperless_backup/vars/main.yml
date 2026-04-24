@@ -1,0 +1,4 @@
+paperless_export_dir: /mnt/USBHDD/paperless-ngx/export
+paperless_install_dir: /opt/paperless
+rclone_destination: onedrive:paperless-backup
+backup_user: root

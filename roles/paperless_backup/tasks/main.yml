@@ -25,10 +25,3 @@
 
 - name: Rclone sync to OneDrive
   shell: rclone sync "{{ paperless_export_dir }}" "{{ rclone_destination }}"
-
-- name: Cronjob for 2AM CEST every day
-  cron:
-    name: "Export paperless-ngx backup to OneDrive"
-    hour: "2"
-    minute: "0"
-    job: "ansible-playbook /root/homelab-ansible/playbooks/paperless_backup.yml"

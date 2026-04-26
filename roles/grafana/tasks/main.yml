@@ -31,6 +31,13 @@
     state: present
     update_cache: yes
 
+- name: Configure Grafana root URL
+  lineinfile:
+    path: /etc/grafana/grafana.ini
+    regexp: '^;?root_url'
+    line: 'root_url = http://192.168.1.22:3000'
+  notify: Restart Grafana
+
 - name: Enable and start Grafana
   systemd:
     name: grafana-server

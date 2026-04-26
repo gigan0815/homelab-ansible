@@ -1,0 +1,5 @@
+prometheus_version: "3.11.2"
+prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+prometheus_bin: "/usr/local/bin/prometheus"
+prometheus_config: "/etc/prometheus/prometheus.yml"
+prometheus_data: "/var/lib/prometheus"

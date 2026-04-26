@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus
+# Start Prometheus after network is available
+After=network.target
+
+[Service]
+Type=simple
+ExecStart={{ prometheus_bin }} \
+  --config.file={{ prometheus_config }} \
+# TSDB = Time Series Database; defines where metrics will be saved
+  --storage.tsdb.path={{ prometheus_data }}
+Restart=on-failure
+
+[Install]
+# Service is startet when system boots into multi-user mode, so when the LXC is started
+WantedBy=multi-user.target

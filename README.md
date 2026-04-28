@@ -1,7 +1,7 @@
 # homelab-ansible
 
 Ansible configuration for managing LXC containers & VMs on a single-node Proxmox homelab.
-Handles package updates, backups, and notifications across all containers.
+Handles package updates, backups, and notifications across all containers/VMs.
 
 For a full overview of the homelab infrastructure see the
 [homelab repository](https://github.com/gigan0815/homelab).

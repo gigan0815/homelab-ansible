@@ -51,6 +51,9 @@ All managed hosts are LXC containers running on Proxmox.
 | ansible | 192.168.1.19 | Debian 13 |
 | prometheus | 192.168.1.21 | Debian 13 |
 | grafana | 192.168.1.22 | Debian 13 |
+| k8smaster | 192.168.1.80 | Ubuntu 24.04 |
+| k8sworker1 | 192.168.1.81 | Ubuntu 24.04 |
+| k8sworker2 | 192.168.1.82 | Ubuntu 24.04 |
 
 ## Playbooks
 
@@ -81,6 +84,11 @@ Deploys Grafana on the monitoring container.
 
     ansible-playbook playbooks/grafana.yml
 
+### kubernetes.yml
+Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
+
+    ansible-playbook playbooks/kubernetes.yml
+
 ## Roles
 
 ### update
@@ -107,6 +115,15 @@ Deploys Grafana on the monitoring container.
 - Installs Grafana via apt repository
 - Configures root URL
 - Deploys systemd service
+
+### kubernetes
+- Disables swap
+- Loads required kernel modules
+- Installs containerd as container runtime
+- Installs kubeadm, kubelet, kubectl
+- Initializes cluster on master node
+- Installs Flannel CNI
+- Joins worker nodes to cluster
 
 ## Vault
 

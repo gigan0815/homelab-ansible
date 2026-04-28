@@ -26,13 +26,15 @@ For a full overview of the homelab infrastructure see the
     │   ├── paperless_backup/
     │   ├── node_exporter/
     │   ├── prometheus/
-    │   └── grafana/
+    │   ├── grafana/
+    │   └── kubernetes/
     ├── playbooks/
     │   ├── update.yml
     │   ├── paperless_backup.yml
     │   ├── node_exporter.yml
     │   ├── prometheus.yml
-    │   └── grafana.yml
+    │   ├── grafana.yml
+    │   └── kubernetes.yml
     └── ansible.cfg
 
 ## Inventory

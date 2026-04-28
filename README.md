@@ -48,11 +48,15 @@ All managed hosts are LXC containers running on Proxmox.
 | prowlarr | 192.168.1.14 | Debian 13 |
 | sonarr | 192.168.1.15 | Debian 13 |
 | radarr | 192.168.1.16 | Debian 13 |
-| jellyfin | 192.168.1.17 | Ubuntu |
+| jellyfin | 192.168.1.17 | Ubuntu 24.04 |
 | bazarr | 192.168.1.18 | Debian 13 |
 | ansible | 192.168.1.19 | Debian 13 |
 | prometheus | 192.168.1.21 | Debian 13 |
 | grafana | 192.168.1.22 | Debian 13 |
+
+VMs for Kubernetes learning environment
+| Host | IP | OS |
+|------|----|----|
 | k8smaster | 192.168.1.80 | Ubuntu 24.04 |
 | k8sworker1 | 192.168.1.81 | Ubuntu 24.04 |
 | k8sworker2 | 192.168.1.82 | Ubuntu 24.04 |

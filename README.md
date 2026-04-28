@@ -43,18 +43,18 @@ All managed hosts are LXC containers running on Proxmox.
 
 | Host | IP | OS |
 |------|----|----|
-| paperless | 192.168.1.12 | Debian 13 |
-| sabnzbd | 192.168.1.13 | Debian 13 |
-| prowlarr | 192.168.1.14 | Debian 13 |
-| sonarr | 192.168.1.15 | Debian 13 |
-| radarr | 192.168.1.16 | Debian 13 |
+| paperless | 192.168.1.12 | Debian 13.4 |
+| sabnzbd | 192.168.1.13 | Debian 13.4 |
+| prowlarr | 192.168.1.14 | Debian 13.4 |
+| sonarr | 192.168.1.15 | Debian 13.4 |
+| radarr | 192.168.1.16 | Debian 13.4 |
 | jellyfin | 192.168.1.17 | Ubuntu 24.04 |
-| bazarr | 192.168.1.18 | Debian 13 |
-| ansible | 192.168.1.19 | Debian 13 |
-| prometheus | 192.168.1.21 | Debian 13 |
-| grafana | 192.168.1.22 | Debian 13 |
+| bazarr | 192.168.1.18 | Debian 13.4 |
+| ansible | 192.168.1.19 | Debian 13.4 |
+| prometheus | 192.168.1.21 | Debian 13.4 |
+| grafana | 192.168.1.22 | Debian 13.4 |
 
-VMs for Kubernetes learning environment
+VMs for Kubernetes learning environment:
 | Host | IP | OS |
 |------|----|----|
 | k8smaster | 192.168.1.80 | Ubuntu 24.04 |

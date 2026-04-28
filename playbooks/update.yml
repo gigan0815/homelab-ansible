@@ -1,5 +1,5 @@
 - name: Update all containers
-  hosts: all
+  hosts: all,!localhost,!k8smaster,!k8sworker1,!k8sworker2
   become: yes
 
   roles:
@@ -13,7 +13,7 @@
   tasks:
     - name: Build list of hosts requiring reboot
       set_fact:
-        reboot_hosts: "{{ groups['all'] | map('extract', hostvars) | selectattr('needs_reboot', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+        reboot_hosts: "{{ groups['all'] | map('extract', hostvars) | selectattr('needs_reboot', 'defined') | selectattr('needs_reboot', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
     - name: Send Discord notification if reboot required
       community.general.discord:
         webhook_id: "{{ discord_webhook_id }}"

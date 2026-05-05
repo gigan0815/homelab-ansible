@@ -1,0 +1,22 @@
+name: Ansible Syntax Check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  syntax-check:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Ansible syntax check
+        run: |
+          cd $GITHUB_WORKSPACE
+          for playbook in playbooks/*.yml; do
+            echo "Checking $playbook..."
+            ansible-playbook "$playbook" --syntax-check
+          done

@@ -1,0 +1,57 @@
+- name: Create runner directory
+  file:
+    path: "{{ runner_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if runner is already installed
+  stat:
+    path: "{{ runner_dir }}/run.sh"
+  register: runner_installed
+
+- name: Download GitHub Actions Runner
+  get_url:
+    url: "https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-x64-{{ runner_version }}.tar.gz"
+    dest: /tmp/actions-runner.tar.gz
+    mode: '0644'
+  when: not runner_installed.stat.exists
+
+- name: Extract GitHub Actions Runner
+  unarchive:
+    src: /tmp/actions-runner.tar.gz
+    dest: "{{ runner_dir }}"
+    remote_src: yes
+  when: not runner_installed.stat.exists
+
+- name: Create runner user
+  user:
+    name: runner
+    system: yes
+    shell: /bin/bash
+    home: "{{ runner_dir }}"
+
+- name: Set runner directory ownership
+  file:
+    path: "{{ runner_dir }}"
+    owner: runner
+    group: runner
+    recurse: yes
+
+- name: Configure GitHub Actions Runner
+  shell: |
+    ./config.sh --url {{ github_repo }} --token {{ github_runner_token }} --name homelab-runner --unattended --replace
+  args:
+    chdir: "{{ runner_dir }}"
+    creates: "{{ runner_dir }}/.runner"
+  become_user: runner
+
+- name: Install runner as systemd service
+  shell: ./svc.sh install
+  args:
+    chdir: "{{ runner_dir }}"
+    creates: /etc/systemd/system/actions.runner.gigan0815-homelab-ansible.homelab-runner.service
+
+- name: Start runner service
+  shell: ./svc.sh start
+  args:
+    chdir: "{{ runner_dir }}"

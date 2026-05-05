@@ -1,0 +1,8 @@
+- name: Deploy GitHub Runner
+  hosts: github-runner
+  become: yes
+  vars_files:
+    - ../group_vars/all/vault.yml
+
+  roles:
+    - github_runner

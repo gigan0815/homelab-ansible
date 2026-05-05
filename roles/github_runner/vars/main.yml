@@ -1,0 +1,4 @@
+runner_version: "2.334.0"
+runner_user: "root"
+runner_dir: "/opt/github-runner"
+github_repo: "https://github.com/gigan0815/homelab-ansible"

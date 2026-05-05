@@ -18,10 +18,16 @@
     path: /root/.config/rclone
     state: directory
 
+- name: Check if rclone.conf exists
+  stat:
+    path: /root/.config/rclone/rclone.conf
+  register: rclone_conf
+
 - name: Copy rclone.conf to LXC
   copy:
     src: rclone.conf
     dest: /root/.config/rclone/rclone.conf
+  when: not rclone_conf.stat.exists
 
 - name: Rclone sync to OneDrive
   shell: rclone sync "{{ paperless_export_dir }}" "{{ rclone_destination }}"

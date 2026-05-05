@@ -15,27 +15,22 @@ For a full overview of the homelab infrastructure see the
 
 ## Repository Structure
 
-    homelab-ansible/
-    ├── inventory/
-    │   └── hosts.yml
-    ├── group_vars/
-    │   └── all/
-    │       └── vault.yml
     ├── roles/
     │   ├── update/
     │   ├── paperless_backup/
     │   ├── node_exporter/
     │   ├── prometheus/
     │   ├── grafana/
-    │   └── kubernetes/
+    │   ├── kubernetes/
+    │   └── github_runner/
     ├── playbooks/
     │   ├── update.yml
     │   ├── paperless_backup.yml
     │   ├── node_exporter.yml
     │   ├── prometheus.yml
     │   ├── grafana.yml
-    │   └── kubernetes.yml
-    └── ansible.cfg
+    │   ├── kubernetes.yml
+    │   └── github_runner.yml
 
 ## Inventory
 
@@ -53,6 +48,7 @@ All managed hosts are LXC containers running on Proxmox.
 | ansible | 192.168.1.19 | Debian 13.4 |
 | prometheus | 192.168.1.21 | Debian 13.4 |
 | grafana | 192.168.1.22 | Debian 13.4 |
+| github-runner | 192.168.1.23 | Debian 13.4 |
 
 VMs for Kubernetes learning environment:
 | Host | IP | OS |
@@ -95,6 +91,11 @@ Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
 
     ansible-playbook playbooks/kubernetes.yml
 
+### github_runner.yml
+Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
+
+    ansible-playbook playbooks/github_runner.yml
+
 ## Roles
 
 ### update
@@ -131,6 +132,12 @@ Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
 - Installs Flannel CNI
 - Joins worker nodes to cluster
 
+### github_runner
+- Creates dedicated runner user
+- Downloads and installs GitHub Actions Runner
+- Configures runner against homelab-ansible repository
+- Installs and starts runner as systemd service
+
 ## Vault
 
 Sensitive credentials are stored encrypted using Ansible Vault.
@@ -144,6 +151,7 @@ Sensitive credentials are stored encrypted using Ansible Vault.
 Required vault variables:
 - `discord_webhook_id`
 - `discord_webhook_token`
+- `github-runner-token`
 
 ## Usage
 

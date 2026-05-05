@@ -15,6 +15,15 @@ For a full overview of the homelab infrastructure see the
 
 ## Repository Structure
 
+    homelab-ansible/
+    ├── .github/
+    │   └── workflows/
+    │       └── ansible-lint.yml
+    ├── inventory/
+    │   └── hosts.yml
+    ├── group_vars/
+    │   └── all/
+    │       └── vault.yml
     ├── roles/
     │   ├── update/
     │   ├── paperless_backup/
@@ -31,6 +40,7 @@ For a full overview of the homelab infrastructure see the
     │   ├── grafana.yml
     │   ├── kubernetes.yml
     │   └── github_runner.yml
+    └── ansible.cfg
 
 ## Inventory
 
@@ -38,19 +48,20 @@ All managed hosts are LXC containers running on Proxmox.
 
 | Host | IP | OS |
 |------|----|----|
-| paperless | 192.168.1.12 | Debian 13.4 |
-| sabnzbd | 192.168.1.13 | Debian 13.4 |
-| prowlarr | 192.168.1.14 | Debian 13.4 |
-| sonarr | 192.168.1.15 | Debian 13.4 |
-| radarr | 192.168.1.16 | Debian 13.4 |
+| paperless | 192.168.1.12 | Debian 13 |
+| sabnzbd | 192.168.1.13 | Debian 13 |
+| prowlarr | 192.168.1.14 | Debian 13 |
+| sonarr | 192.168.1.15 | Debian 13 |
+| radarr | 192.168.1.16 | Debian 13 |
 | jellyfin | 192.168.1.17 | Ubuntu 24.04 |
-| bazarr | 192.168.1.18 | Debian 13.4 |
-| ansible | 192.168.1.19 | Debian 13.4 |
-| prometheus | 192.168.1.21 | Debian 13.4 |
-| grafana | 192.168.1.22 | Debian 13.4 |
-| github-runner | 192.168.1.23 | Debian 13.4 |
+| bazarr | 192.168.1.18 | Debian 13 |
+| ansible | 192.168.1.19 | Debian 13 |
+| prometheus | 192.168.1.21 | Debian 13 |
+| grafana | 192.168.1.22 | Debian 13 |
+| github-runner | 192.168.1.23 | Debian 13 |
 
 VMs for Kubernetes learning environment:
+
 | Host | IP | OS |
 |------|----|----|
 | k8smaster | 192.168.1.80 | Ubuntu 24.04 |
@@ -133,10 +144,19 @@ Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
 - Joins worker nodes to cluster
 
 ### github_runner
+- Installs Ansible on the runner
 - Creates dedicated runner user
 - Downloads and installs GitHub Actions Runner
 - Configures runner against homelab-ansible repository
 - Installs and starts runner as systemd service
+
+## CI/CD
+
+Automated syntax checking runs on every push to main via GitHub Actions.
+The self-hosted runner is deployed on the github-runner LXC container.
+
+### Workflows
+- `ansible-lint.yml` - runs Ansible syntax check on all playbooks on every push to main
 
 ## Vault
 
@@ -151,7 +171,7 @@ Sensitive credentials are stored encrypted using Ansible Vault.
 Required vault variables:
 - `discord_webhook_id`
 - `discord_webhook_token`
-- `github-runner-token`
+- `github_runner_token`
 
 ## Usage
 
@@ -168,6 +188,10 @@ Deploy monitoring stack:
     ansible-playbook playbooks/node_exporter.yml
     ansible-playbook playbooks/prometheus.yml
     ansible-playbook playbooks/grafana.yml
+
+Deploy GitHub Actions runner:
+
+    ansible-playbook playbooks/github_runner.yml
 
 Test connectivity to all hosts:
 

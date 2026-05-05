@@ -1,4 +1,4 @@
-name: Ansible Syntax Check
+name: Ansible Syntax Checking
 
 on:
   push:
@@ -13,6 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create vault password file
+        run: echo -n "${{ secrets.VAULT_PASSWORD }}" > /root/.vault_pass && chmod 600 /root/.vault_pass
+
       - name: Run Ansible syntax check
         run: |
           cd $GITHUB_WORKSPACE
@@ -20,3 +23,8 @@ jobs:
             echo "Checking $playbook..."
             ansible-playbook "$playbook" --syntax-check
           done
+
+      - name: Remove vault password file
+        run: rm /root/.vault_pass
+        if: always()
+

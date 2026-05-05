@@ -4,6 +4,14 @@
     state: directory
     mode: '0755'
 
+- name: Install Ansible
+  apt:
+    name:
+      - ansible
+      - python3
+    state: present
+    update_cache: yes
+
 - name: Check if runner is already installed
   stat:
     path: "{{ runner_dir }}/run.sh"

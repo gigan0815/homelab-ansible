@@ -103,7 +103,8 @@ Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
     ansible-playbook playbooks/kubernetes.yml
 
 ### github_runner.yml
-Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
+Deploys two GitHub Actions self-hosted runners on the github-runner LXC container,
+one for homelab-ansible and one for homelab-kubernetes.
 
     ansible-playbook playbooks/github_runner.yml
 
@@ -144,11 +145,11 @@ Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
 - Joins worker nodes to cluster
 
 ### github_runner
-- Installs Ansible on the runner
+- Installs Ansible, kubectl and kubeconform on the runner
 - Creates dedicated runner user
 - Downloads and installs GitHub Actions Runner
-- Configures runner against homelab-ansible repository
-- Installs and starts runner as systemd service
+- Configures two runner instances (homelab-ansible and homelab-kubernetes)
+- Installs and starts runners as systemd services
 
 ## CI/CD
 
@@ -172,6 +173,7 @@ Required vault variables:
 - `discord_webhook_id`
 - `discord_webhook_token`
 - `github_runner_token`
+- `github_kubernetes_runner_token`
 
 ## Usage
 
@@ -189,7 +191,7 @@ Deploy monitoring stack:
     ansible-playbook playbooks/prometheus.yml
     ansible-playbook playbooks/grafana.yml
 
-Deploy GitHub Actions runner:
+Deploy GitHub Actions runners:
 
     ansible-playbook playbooks/github_runner.yml
 

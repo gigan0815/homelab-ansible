@@ -1,0 +1,28 @@
+- name: Deploy UniFi Network Controller
+  hosts: unifi-controller
+  become: true
+
+  vars:
+    unifi_ip: "192.168.1.24"
+    unifi_lxc_id: 111  # Change to LXC container ID
+
+  pre_tasks:
+    - name: Verify target host
+      debug:
+        msg: "Deploying UniFi Controller to {{ inventory_hostname }} ({{ ansible_host }})"
+
+  roles:
+    - unifi_controller
+
+  post_tasks:
+    - name: Show access info
+      debug:
+        msg:
+          - "UniFi Controller deployed successfully!"
+          - "Access: https://{{ ansible_host }}:8443"
+          - ""
+          - "Next steps:"
+          - "1. Open https://{{ ansible_host }}:8443 and complete setup wizard"
+          - "2. Restore backup from UXG Express"
+          - "3. Re-adopt UXG Express to new controller"
+          - "4. Disable controller on UXG Express via SSH"

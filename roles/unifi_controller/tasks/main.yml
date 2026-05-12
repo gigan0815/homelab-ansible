@@ -1,0 +1,84 @@
+---
+- name: Install dependencies
+  apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+      - gnupg
+      - curl
+      - jsvc
+      - libcap2
+    state: present
+    update_cache: yes
+
+- name: Install Java 21
+  apt:
+    name: openjdk-21-jre-headless
+    state: present
+
+# MongoDB 7.0
+- name: Add MongoDB 7.0 apt key
+  shell: |
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
+    gpg --dearmor -o /etc/apt/trusted.gpg.d/mongodb-org-7.0.gpg
+  args:
+    creates: /etc/apt/trusted.gpg.d/mongodb-org-7.0.gpg
+
+- name: Remove old MongoDB 3.6 repo if present
+  file:
+    path: /etc/apt/sources.list.d/mongodb-org-3.6.list
+    state: absent
+
+- name: Remove old MongoDB 3.6 key if present
+  file:
+    path: /etc/apt/trusted.gpg.d/mongodb-org-3.6.gpg
+    state: absent
+
+- name: Add MongoDB 7.0 repo
+  copy:
+    dest: /etc/apt/sources.list.d/mongodb-org-7.0.list
+    content: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main\n"
+
+- name: Install MongoDB 7.0
+  apt:
+    name:
+      - mongodb-org
+    state: present
+    update_cache: yes
+
+- name: Enable and start MongoDB service
+  systemd:
+    name: mongod
+    enabled: yes
+    state: started
+
+# UniFi Network Application
+- name: Add UniFi apt key
+  shell: |
+    curl -fsSL https://dl.ui.com/unifi/unifi-repo.gpg | \
+    gpg --dearmor -o /etc/apt/trusted.gpg.d/unifi.gpg
+  args:
+    creates: /etc/apt/trusted.gpg.d/unifi.gpg
+
+- name: Add UniFi repo
+  copy:
+    dest: /etc/apt/sources.list.d/unifi.list
+    content: "deb https://www.ui.com/downloads/unifi/debian stable ubiquiti\n"
+
+- name: Install UniFi Network Application
+  apt:
+    name: unifi
+    state: present
+    update_cache: yes
+
+- name: Enable and start UniFi service
+  systemd:
+    name: unifi
+    enabled: yes
+    state: started
+
+- name: Wait for UniFi to be ready
+  wait_for:
+    port: 8443
+    host: "{{ ansible_host }}"
+    timeout: 180

@@ -1,4 +1,11 @@
 runner_version: "2.334.0"
-runner_user: "root"
-runner_dir: "/opt/github-runner"
-github_repo: "https://github.com/gigan0815/homelab-ansible"
+
+runners:
+  - name: "homelab-ansible-runner"
+    dir: "/opt/github-runner-ansible"
+    repo: "https://github.com/gigan0815/homelab-ansible"
+    token: "{{ github_runner_token }}"
+  - name: "homelab-kubernetes-runner"
+    dir: "/opt/github-runner-kubernetes"
+    repo: "https://github.com/gigan0815/homelab-kubernetes"
+    token: "{{ github_kubernetes_runner_token }}"

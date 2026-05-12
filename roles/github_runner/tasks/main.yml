@@ -1,9 +1,3 @@
-- name: Create runner directory
-  file:
-    path: "{{ runner_dir }}"
-    state: directory
-    mode: '0755'
-
 - name: Install Ansible
   apt:
     name:
@@ -20,6 +14,12 @@
       - apt-transport-https
     state: present
     update_cache: yes
+
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
 - name: Add Kubernetes apt key
   shell: |
@@ -39,54 +39,74 @@
     state: present
     update_cache: yes
 
-- name: Check if runner is already installed
+- name: Check if kubeconform is installed
   stat:
-    path: "{{ runner_dir }}/run.sh"
-  register: runner_installed
+    path: /usr/local/bin/kubeconform
+  register: kubeconform_installed
 
-- name: Download GitHub Actions Runner
-  get_url:
-    url: "https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-x64-{{ runner_version }}.tar.gz"
-    dest: /tmp/actions-runner.tar.gz
-    mode: '0644'
-  when: not runner_installed.stat.exists
-
-- name: Extract GitHub Actions Runner
-  unarchive:
-    src: /tmp/actions-runner.tar.gz
-    dest: "{{ runner_dir }}"
-    remote_src: yes
-  when: not runner_installed.stat.exists
+- name: Install kubeconform
+  shell: |
+    curl -L https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz -C /tmp
+    mv /tmp/kubeconform /usr/local/bin/
+  when: not kubeconform_installed.stat.exists
 
 - name: Create runner user
   user:
     name: runner
     system: yes
     shell: /bin/bash
-    home: "{{ runner_dir }}"
+    home: /home/runner
 
-- name: Set runner directory ownership
+- name: Create runner directories
   file:
-    path: "{{ runner_dir }}"
+    path: "{{ item.dir }}"
+    state: directory
     owner: runner
     group: runner
-    recurse: yes
+    mode: '0755'
+  loop: "{{ runners }}"
+
+- name: Check if runner is already installed
+  stat:
+    path: "{{ item.dir }}/run.sh"
+  register: runner_installed
+  loop: "{{ runners }}"
+
+- name: Download GitHub Actions Runner
+  get_url:
+    url: "https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-x64-{{ runner_version }}.tar.gz"
+    dest: /tmp/actions-runner.tar.gz
+    mode: '0644'
+  when: not runner_installed.results | map(attribute='stat.exists') | min
+
+- name: Extract GitHub Actions Runner
+  unarchive:
+    src: /tmp/actions-runner.tar.gz
+    dest: "{{ item.item.dir }}"
+    remote_src: yes
+    owner: runner
+    group: runner
+  loop: "{{ runner_installed.results }}"
+  when: not item.stat.exists
 
 - name: Configure GitHub Actions Runner
   shell: |
-    ./config.sh --url {{ github_repo }} --token {{ github_runner_token }} --name homelab-runner --unattended --replace
+    ./config.sh --url {{ item.item.repo }} --token {{ item.item.token }} --name {{ item.item.name }} --unattended --replace
   args:
-    chdir: "{{ runner_dir }}"
-    creates: "{{ runner_dir }}/.runner"
+    chdir: "{{ item.item.dir }}"
   become_user: runner
+  loop: "{{ runner_installed.results }}"
+  when: not item.stat.exists
 
 - name: Install runner as systemd service
-  shell: ./svc.sh install
+  shell: ./svc.sh install runner
   args:
-    chdir: "{{ runner_dir }}"
-    creates: /etc/systemd/system/actions.runner.gigan0815-homelab-ansible.homelab-runner.service
+    chdir: "{{ item.dir }}"
+    creates: "/etc/systemd/system/actions.runner.gigan0815-{{ item.repo | basename }}.{{ item.name }}.service"
+  loop: "{{ runners }}"
 
-- name: Start runner service
+- name: Start runner services
   shell: ./svc.sh start
   args:
-    chdir: "{{ runner_dir }}"
+    chdir: "{{ item.dir }}"
+  loop: "{{ runners }}"

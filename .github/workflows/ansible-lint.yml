@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Create vault password file
         run: echo -n "${{ secrets.VAULT_PASSWORD }}" > /root/.vault_pass && chmod 600 /root/.vault_pass

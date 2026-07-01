@@ -1,5 +1,5 @@
 - name: Update all containers
-  hosts: all,!localhost,!k8smaster,!k8sworker1,!k8sworker2
+  hosts: all,!localhost,!k8smaster,!k8sworker1,!k8sworker2,!nas
   become: yes
 
   roles:

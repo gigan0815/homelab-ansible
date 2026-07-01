@@ -60,6 +60,14 @@ All managed hosts are LXC containers running on Proxmox.
 | grafana | 192.168.1.22 | Debian 13 |
 | github-runner | 192.168.1.23 | Debian 13 |
 
+**Reference-only host (not Ansible-managed):**
+
+| Host | IP | OS |
+|------|----|----|
+| truenas | 192.168.1.6 | TrueNAS SCALE |
+
+`truenas` is an appliance running the NAS storage pool (see `docs/architecture.svg` and the [homelab README](https://github.com/gigan0815/homelab)). It's listed in `inventory/hosts.yml` under the `nas` group for reference and future automation, but it is **explicitly excluded** from `playbooks/update.yml` and `playbooks/node_exporter.yml` (`hosts: all,!localhost,!nas` / `all,!nas`). TrueNAS manages its own OS updates and does not accept the same SSH/root access pattern as the LXCs — running the generic `update` or `node_exporter` roles against it would either fail or (for node_exporter) conflict with the instance already deployed there via TrueNAS's own Docker/Apps system. NFS shares and node_exporter on TrueNAS are managed through the TrueNAS UI, not Ansible.
+
 VMs for Kubernetes learning environment:
 
 | Host | IP | OS |

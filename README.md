@@ -60,6 +60,17 @@ All managed hosts are LXC containers running on Proxmox.
 | grafana | 192.168.1.22 | Debian 13 |
 | github-runner | 192.168.1.23 | Debian 13 |
 
+**Reference-only host (not Ansible-managed):**
+
+| Host | IP | OS |
+|------|----|----|
+| truenas | 192.168.1.6 | TrueNAS SCALE |
+
+`truenas` is an appliance running the NAS storage pool (see `docs/architecture.svg` and the [homelab README](https://github.com/gigan0815/homelab)). 
+It's listed in `inventory/hosts.yml` under the `nas` group for reference and future automation, but it is **explicitly excluded** from `playbooks/update.yml` and `playbooks/node_exporter.yml` (`hosts: all,!localhost,!nas` / `all,!nas`). 
+TrueNAS manages its own OS updates and does not accept the same SSH/root access pattern as the LXCs — running the generic `update` or `node_exporter` roles against it would either fail or (for node_exporter) conflict with the instance already deployed there via TrueNAS's own Docker/Apps system.
+NFS shares and node_exporter on TrueNAS are managed through the TrueNAS UI, not Ansible.
+
 VMs for Kubernetes learning environment:
 
 | Host | IP | OS |
@@ -103,7 +114,8 @@ Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
     ansible-playbook playbooks/kubernetes.yml
 
 ### github_runner.yml
-Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
+Deploys two GitHub Actions self-hosted runners on the github-runner LXC container,
+one for homelab-ansible and one for homelab-kubernetes.
 
     ansible-playbook playbooks/github_runner.yml
 
@@ -144,11 +156,11 @@ Deploys a GitHub Actions self-hosted runner on the github-runner LXC container.
 - Joins worker nodes to cluster
 
 ### github_runner
-- Installs Ansible on the runner
+- Installs Ansible, kubectl and kubeconform on the runner
 - Creates dedicated runner user
 - Downloads and installs GitHub Actions Runner
-- Configures runner against homelab-ansible repository
-- Installs and starts runner as systemd service
+- Configures two runner instances (homelab-ansible and homelab-kubernetes)
+- Installs and starts runners as systemd services
 
 ## CI/CD
 
@@ -172,6 +184,7 @@ Required vault variables:
 - `discord_webhook_id`
 - `discord_webhook_token`
 - `github_runner_token`
+- `github_kubernetes_runner_token`
 
 ## Usage
 
@@ -189,7 +202,7 @@ Deploy monitoring stack:
     ansible-playbook playbooks/prometheus.yml
     ansible-playbook playbooks/grafana.yml
 
-Deploy GitHub Actions runner:
+Deploy GitHub Actions runners:
 
     ansible-playbook playbooks/github_runner.yml
 

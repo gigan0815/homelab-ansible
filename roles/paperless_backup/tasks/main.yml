@@ -9,7 +9,7 @@
     state: directory
 
 - name: Start paperless-ngx export
-  shell: "uv run manage.py document_exporter {{ paperless_export_dir }}"
+  shell: "uv run manage.py document_exporter {{ paperless_export_dir }} --no-archive --no-thumbnail --delete"
   args:
     chdir: "{{ paperless_install_dir }}/src"
 

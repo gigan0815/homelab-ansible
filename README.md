@@ -1,7 +1,7 @@
 # homelab-ansible
 
-Ansible configuration for managing LXC containers & VMs on a single-node Proxmox homelab.
-Handles package updates, backups, and notifications across all containers/VMs.
+Ansible configuration for managing LXC containers on a single-node Proxmox homelab.
+Handles package updates, backups, and notifications across all containers.
 
 For a full overview of the homelab infrastructure see the
 [homelab repository](https://github.com/gigan0815/homelab).
@@ -30,7 +30,6 @@ For a full overview of the homelab infrastructure see the
     │   ├── node_exporter/
     │   ├── prometheus/
     │   ├── grafana/
-    │   ├── kubernetes/
     │   └── github_runner/
     ├── playbooks/
     │   ├── update.yml
@@ -38,7 +37,6 @@ For a full overview of the homelab infrastructure see the
     │   ├── node_exporter.yml
     │   ├── prometheus.yml
     │   ├── grafana.yml
-    │   ├── kubernetes.yml
     │   └── github-runner.yml
     └── ansible.cfg
 
@@ -73,14 +71,6 @@ It's listed in `inventory/hosts.yml` under the `nas` group for reference and fut
 TrueNAS manages its own OS updates and does not accept the same SSH/root access pattern as the LXCs — running the generic `update` or `node_exporter` roles against it would either fail or (for node_exporter) conflict with the instance already deployed there via TrueNAS's own Docker/Apps system.
 NFS shares and node_exporter on TrueNAS are managed through the TrueNAS UI, not Ansible.
 
-VMs for Kubernetes learning environment (not present on the Proxmox host as of 2026-10-23, which has no VMs):
-
-| Host | IP | OS |
-|------|----|----|
-| k8smaster | 192.168.1.80 | Ubuntu 24.04 |
-| k8sworker1 | 192.168.1.81 | Ubuntu 24.04 |
-| k8sworker2 | 192.168.1.82 | Ubuntu 24.04 |
-
 ## Playbooks
 
 ### update.yml
@@ -109,11 +99,6 @@ Deploys Prometheus on the monitoring container.
 Deploys Grafana on the monitoring container.
 
     ansible-playbook playbooks/grafana.yml
-
-### kubernetes.yml
-Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
-
-    ansible-playbook playbooks/kubernetes.yml
 
 ### github-runner.yml
 Deploys two GitHub Actions self-hosted runners on the github-runner LXC container,
@@ -152,15 +137,6 @@ Deploys the UniFi controller. The target container is set by `unifi_lxc_id` in t
 - Installs Grafana via apt repository
 - Configures root URL
 - Deploys systemd service
-
-### kubernetes
-- Disables swap
-- Loads required kernel modules
-- Installs containerd as container runtime
-- Installs kubeadm, kubelet, kubectl
-- Initializes cluster on master node
-- Installs Flannel CNI
-- Joins worker nodes to cluster
 
 ### github_runner
 - Installs Ansible, kubectl and kubeconform on the runner

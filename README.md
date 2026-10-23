@@ -39,12 +39,14 @@ For a full overview of the homelab infrastructure see the
     │   ├── prometheus.yml
     │   ├── grafana.yml
     │   ├── kubernetes.yml
-    │   └── github_runner.yml
+    │   └── github-runner.yml
     └── ansible.cfg
 
 ## Inventory
 
 All managed hosts are LXC containers running on Proxmox.
+
+> `ansible` (LXC 107) is in this table but not in `inventory/hosts.yml`, so `update.yml` and `node_exporter.yml` never target the control node. Keep that in mind before assuming the control node is patched or monitored by these playbooks.
 
 | Host | IP | OS |
 |------|----|----|
@@ -71,7 +73,7 @@ It's listed in `inventory/hosts.yml` under the `nas` group for reference and fut
 TrueNAS manages its own OS updates and does not accept the same SSH/root access pattern as the LXCs — running the generic `update` or `node_exporter` roles against it would either fail or (for node_exporter) conflict with the instance already deployed there via TrueNAS's own Docker/Apps system.
 NFS shares and node_exporter on TrueNAS are managed through the TrueNAS UI, not Ansible.
 
-VMs for Kubernetes learning environment:
+VMs for Kubernetes learning environment (not present on the Proxmox host as of 2026-10-23, which has no VMs):
 
 | Host | IP | OS |
 |------|----|----|
@@ -113,11 +115,16 @@ Deploys a Kubernetes cluster on the three VMs (1 master, 2 workers).
 
     ansible-playbook playbooks/kubernetes.yml
 
-### github_runner.yml
+### github-runner.yml
 Deploys two GitHub Actions self-hosted runners on the github-runner LXC container,
 one for homelab-ansible and one for homelab-kubernetes.
 
-    ansible-playbook playbooks/github_runner.yml
+    ansible-playbook playbooks/github-runner.yml
+
+### unifi_controller.yml
+Deploys the UniFi controller. The target container is set by `unifi_lxc_id` in the playbook, currently `111`, which does not exist on the Proxmox host as of 2026-10-23.
+
+    ansible-playbook playbooks/unifi_controller.yml
 
 ## Roles
 
@@ -204,7 +211,7 @@ Deploy monitoring stack:
 
 Deploy GitHub Actions runners:
 
-    ansible-playbook playbooks/github_runner.yml
+    ansible-playbook playbooks/github-runner.yml
 
 Test connectivity to all hosts:
 
